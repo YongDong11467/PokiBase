@@ -1,0 +1,57 @@
+
+{% extends "base.html" %}
+{% block title %}Team Building{% endblock %}
+{% block content %}
+        <div class="container" id="team">
+            <div>
+                <h2>Team</h2>
+            </div>
+            <div class="justify-content-center">
+                <ul class="list-group list-group-horizontal justify-content-center">
+                    {% for i in range(0,6) %}
+                    <li class="list-group-item">
+                        <div>
+                            <img src="{{ url_for('static', filename='./images/unknown.png')}}"  width="100" height="100">
+                        </div>
+                        <div>
+                            <span>name</span>
+                            <br>
+                            <span class="badge bg-secondary">Normal</span>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="mt-5 container">
+            <div class="row">
+                <form class="form-inline" action="/team" method="GET">
+                    <div class="col-auto">
+                        <input class="form-control" type="text" name="search" placeholder="Search" value="{{search if search}}" aria-label="Search">
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-outline-success" type="submit" value="submit">Search</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% if pokemon != None %}
+            <div class="card" style="width: 18rem;">
+              <img src="{{pokemon.sprites.front_default}}" class="card-img-top" alt="...">
+              <div class="card-body">
+                <h5 class="card-title">{{pokemon.name}}</h5>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <button class="btn btn-primary" type="button">Add to team</button>
+              </div>
+            </div>
+        {% endif %}
+
+        {% if displayNotFound %}
+            <div class="alert alert-danger" role="alert">
+              {{search}} not found in database
+            </div>
+        {% endif %}
+
+{% endblock %}
