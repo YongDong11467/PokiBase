@@ -32,5 +32,26 @@ def team():
             displayNotFound = True
     return render_template("team.html", pokemon=pokemon, displayNotFound=displayNotFound, search=search)
 
+@app.route('/edit', methods=['GET', 'POST'])
+def edit():
+    #if request.method == "GET":
+
+    #finds pokemon to get removed
+    #TODO add backend functionality
+    if request.method == "POST":   
+        if request.form["remove"] == "0":
+           print("Remove0")
+        if request.form["remove"] == "1":
+           print("Remove1")
+        if request.form["remove"] == "2":
+           print("Remove2")
+        if request.form["remove"] == "3":
+           print("Remove3")
+        if request.form["remove"] == "4":
+           print("Remove4")
+        if request.form["remove"] == "5":
+           print("Remove5")   
+    return render_template("edit.html")    
+
 if __name__ == "__main__":
     app.run(debug=True)
