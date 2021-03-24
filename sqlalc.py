@@ -35,6 +35,44 @@ class StorePokemon(Base):
         return "<StorePokemon(pokemonid='{0}', pokemonname='{1}', height='{2}', weight='{3}')>".format(
             self.pokemonid, self.pokemonname, self.height, self.weight)
 
+class StoreMoveRel(Base):
+
+    __tablename__ = 'moverel'
+
+    pokemonid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    moveid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+
+    def __init__(self, pokemonid, moveid):
+        self.pokemonid = pokemonid
+        self.moveid = moveid
+
+    def __repr__(self):
+        return "<StoreMoveRel(pokemonid='{0}', moveid='{1}'>".format(
+            self.pokemonid, self.moveid)
+
+class StoreMove(Base):
+
+    __tablename__ = 'move'
+
+    moveid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    typeid = sqlalchemy.Column(sqlalchemy.Integer)
+    name = sqlalchemy.Column(sqlalchemy.String(length=50))
+    description = sqlalchemy.Column(sqlalchemy.String(length=200))
+    accuracy = sqlalchemy.Column(sqlalchemy.Integer)
+    power = sqlalchemy.Column(sqlalchemy.Integer)
+
+    def __init__(self, moveid, typeid, name, description, accuracy, power):
+        self.moveid = moveid
+        self.typeid = typeid
+        self.name = name
+        self.description = description
+        self.accuracy = accuracy
+        self.power = power
+
+    def __repr__(self):
+        return "<StoreMove(moveid='{0}', typeid='{1}', name='{2}', description='{3}', accuracy'{4}', power'{5}')>".format(
+            self.moveid, self.typeid, self.name, self.description, self.accuracy, self.power)
+
 
 Base.metadata.create_all(engine)  # creates the stores table
 
