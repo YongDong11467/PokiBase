@@ -1,8 +1,9 @@
-from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template, url_for, request, session, redirect
 import sqlalc
 import requests
 import json
 app = Flask(__name__)
+app.secret_key = "qwertyuiop"
 
 baseUrl = 'https://pokeapi.co/api/v2/'
 typeDictionary = {
@@ -37,9 +38,17 @@ def home():
 
 @app.route('/team', methods=['GET', 'POST'])
 def team():
+    if not 'curteam' in session:
+        session['curteam'] = []
+    if not 'curteamimg' in session:
+        session['curteamimg'] = []
+
+    curteam = session['curteam']
+    curteamimg = session['curteamimg']
     search = None
     displayNotFound = False
     pokemon = None
+    # session['curpokemon'] = "troll"
     if request.method == "GET":
         search = request.args.get("search")
         res = requests.get(baseUrl + f'pokemon/{search}')
@@ -47,6 +56,8 @@ def team():
         if res.content != b'Not Found':
             print("Pokemon founded!")
             pokemon = json.loads(res.content)
+            session['curpokemon'] = pokemon["name"]
+            session['curimageRef'] = pokemon["sprites"]["front_default"]
             newPokemon = sqlalc.StorePokemon(pokemon['id'], pokemon['name'], pokemon['height'], pokemon['weight'])
             sqlalc.session.merge(newPokemon)
             # Too expensive works but takes too long to add everything to the database
@@ -54,7 +65,39 @@ def team():
             sqlalc.session.commit()
         elif search is not None:
             displayNotFound = True
-    return render_template("team.html", pokemon=pokemon, displayNotFound=displayNotFound, search=search)
+    return render_template("team.html", pokemon=pokemon, displayNotFound=displayNotFound, search=search, curteamimg=curteamimg)
+
+@app.route('/addtoteam')
+def addtoteam():
+    print("in add team")
+    if not 'curteam' in session:
+        session['curteam'] = []
+    if not 'curteamimg' in session:
+        session['curteamimg'] = []
+
+    curteam = session['curteam']
+    curteamimg = session['curteamimg']
+
+    if len(curteam) > 5:
+        return redirect(url_for("team"))
+
+    if 'curpokemon' in session:
+        print("in if")
+        curteam.append(session['curpokemon'])
+        session['curteam'] = curteam
+        print(session["curteam"])
+        # print(session["curteam"]["sprites"]["front_default"])
+    if 'curimageRef' in session:
+        curteamimg.append(session['curimageRef'])
+        session['curteamimg'] = curteamimg
+        print(session["curteamimg"])
+    return redirect(url_for("team"))
+
+@app.route('/clearteam')
+def clearteam():
+    session.pop("curteam", None)
+    session.pop("curteamimg", None)
+    return redirect(url_for("team"))
 
 def updateMovesTable(pokemoneid, moves):
     for move in moves:
