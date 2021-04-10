@@ -12,6 +12,10 @@ import connection_info
 engine = sqlalchemy.create_engine(
     'mysql+mysqlconnector://root:' + connection_info.MyPassword + connection_info.MyHost + connection_info.MyDatabase,
     echo=True)
+# cnx = mysql.connector.connect(user=connection_info.MyUser, password=connection_info.MyPassword,
+#                               host=connection_info.MyHost,
+#                               database=connection_info.MyDatabase)
+# cursor = cnx.cursor()
 
 # Define and create the table
 Base = declarative_base()
@@ -80,3 +84,19 @@ Base.metadata.create_all(engine)  # creates the stores table
 Session = sqlalchemy.orm.sessionmaker()
 Session.configure(bind=engine)
 session = Session()
+
+connection = engine.connect()
+
+def getMove(name):
+    query = """Select * from move where move.name = %s"""
+    arg = (name)
+    result_proxy = connection.execute(query, arg)
+
+    results = result_proxy.fetchall()
+    return results[0]
+    # try:
+    #     cursor.execute(query, arg)
+    # except mysql.connector.Error as err:
+    #     print(err.msg)
+    # for x in cursor:
+    #     print(x)

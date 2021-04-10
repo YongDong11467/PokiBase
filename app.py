@@ -48,24 +48,41 @@ def team():
     search = None
     displayNotFound = False
     pokemon = None
+    move = None
+    ability = None
     # session['curpokemon'] = "troll"
     if request.method == "GET":
         search = request.args.get("search")
-        res = requests.get(baseUrl + f'pokemon/{search}')
-        print(baseUrl + f'pokemon/{search}')
-        if res.content != b'Not Found':
-            print("Pokemon founded!")
-            pokemon = json.loads(res.content)
-            session['curpokemon'] = pokemon["name"]
-            session['curimageRef'] = pokemon["sprites"]["front_default"]
-            newPokemon = sqlalc.StorePokemon(pokemon['id'], pokemon['name'], pokemon['height'], pokemon['weight'])
-            sqlalc.session.merge(newPokemon)
-            # Too expensive works but takes too long to add everything to the database
-            # updateMovesTable(pokemon['id'], pokemon['moves'])
-            sqlalc.session.commit()
-        elif search is not None:
-            displayNotFound = True
-    return render_template("team.html", pokemon=pokemon, displayNotFound=displayNotFound, search=search, curteamimg=curteamimg)
+        option = request.args.get('inlineRadioOptions')
+        print(option)
+        if option == 'Pokemon':
+            res = requests.get(baseUrl + f'pokemon/{search}')
+            print(baseUrl + f'pokemon/{search}')
+            if res.content != b'Not Found':
+                print("Pokemon founded!")
+                pokemon = json.loads(res.content)
+                session['curpokemon'] = pokemon["name"]
+                session['curimageRef'] = pokemon["sprites"]["front_default"]
+                newPokemon = sqlalc.StorePokemon(pokemon['id'], pokemon['name'], pokemon['height'], pokemon['weight'])
+                sqlalc.session.merge(newPokemon)
+                # Too expensive works but takes too long to add everything to the database
+                # updateMovesTable(pokemon['id'], pokemon['moves'])
+                sqlalc.session.commit()
+            elif search is not None:
+                displayNotFound = True
+        elif option == 'Move':
+            print("Getting move")
+            move = sqlalc.getMove(search)
+            # res = requests.get(baseUrl + f'move/{search}')
+            # print(baseUrl + f'move/{search}')
+            # if res.content != b'Not Found':
+            #     print("Move founded!")
+            #     move = json.loads(res.content)
+            #     print(move)
+
+        else:
+            pass
+    return render_template("team.html", pokemon=pokemon, move=move, displayNotFound=displayNotFound, search=search, curteamimg=curteamimg)
 
 @app.route('/addtoteam')
 def addtoteam():

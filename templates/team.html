@@ -32,6 +32,18 @@
                     <div class="col-auto">
                         <input class="form-control" type="text" name="search" placeholder="Search" value="{{search if search}}" aria-label="Search">
                     </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="Pokemon" checked>
+                      <label class="form-check-label" for="inlineRadio1">Pokemon</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="Move">
+                      <label class="form-check-label" for="inlineRadio2">Move</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="Ability">
+                      <label class="form-check-label" for="inlineRadio3">Ability</label>
+                    </div>
                     <div class="col-auto">
                         <button class="btn btn-outline-success" type="submit" value="submit">Search</button>
                     </div>
@@ -40,12 +52,21 @@
         </div>
 
         {% if pokemon != None %}
-            <div class="card" style="width: 18rem;">
+            <div class="card container" style="width: 18rem;">
               <img src="{{pokemon.sprites.front_default}}" class="card-img-top" alt="...">
               <div class="card-body">
                 <h5 class="card-title">{{pokemon.name}}</h5>
                 <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
                 <a class="btn btn-primary" type="button" href="/addtoteam">Add to team</a>
+              </div>
+            </div>
+        {% endif %}
+
+        {% if move != None %}
+            <div class="card container" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">{{move.name}}</h5>
+                <p class="card-text">{{move.description}}</p>
               </div>
             </div>
         {% endif %}
