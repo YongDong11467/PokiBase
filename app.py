@@ -82,7 +82,7 @@ def team():
 
         else:
             pass
-    return render_template("team.html", pokemon=pokemon, move=move, displayNotFound=displayNotFound, search=search, curteamimg=curteamimg)
+    return render_template("team.html", pokemon=pokemon, move=move, displayNotFound=displayNotFound, search=search, curteam=curteam, curteamimg=curteamimg)
 
 @app.route('/addtoteam')
 def addtoteam():
