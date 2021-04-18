@@ -4,6 +4,7 @@ import requests
 import json
 app = Flask(__name__)
 app.secret_key = "qwertyuiop"
+from random import randint
 
 baseUrl = 'https://pokeapi.co/api/v2/'
 typeDictionary = {
@@ -61,12 +62,15 @@ def team():
             if res.content != b'Not Found':
                 print("Pokemon founded!")
                 pokemon = json.loads(res.content)
+                # statid = randint(1, 10000)
                 session['curpokemon'] = pokemon["name"]
                 session['curimageRef'] = pokemon["sprites"]["front_default"]
                 newPokemon = sqlalc.StorePokemon(pokemon['id'], pokemon['name'], pokemon['height'], pokemon['weight'])
                 sqlalc.session.merge(newPokemon)
-                # Too expensive works but takes too long to add everything to the database
+                # Moves is too expensive works but takes too long to add everything to the database
                 # updateMovesTable(pokemon['id'], pokemon['moves'])
+                updateAbilityTable(pokemon['id'], pokemon['abilities'])
+                updateTypeTable(pokemon['id'], pokemon['types'])
                 sqlalc.session.commit()
             elif search is not None:
                 displayNotFound = True
@@ -79,10 +83,10 @@ def team():
             #     print("Move founded!")
             #     move = json.loads(res.content)
             #     print(move)
-
-        else:
-            pass
-    return render_template("team.html", pokemon=pokemon, move=move, displayNotFound=displayNotFound, search=search, curteam=curteam, curteamimg=curteamimg)
+        elif option == 'Ability':
+            ability = sqlalc.getAbility(search)
+    return render_template("team.html", pokemon=pokemon, move=move, ability=ability,
+                           displayNotFound=displayNotFound, search=search, curteam=curteam, curteamimg=curteamimg)
 
 @app.route('/addtoteam')
 def addtoteam():
@@ -129,6 +133,27 @@ def updateMovesTable(pokemoneid, moves):
         newMoveRel = sqlalc.StoreMoveRel(pokemoneid, moveData['id'])
         sqlalc.session.merge(newMove)
         sqlalc.session.merge(newMoveRel)
+
+def updateAbilityTable(pokemoneid, abilities):
+    for ability in abilities:
+        res = requests.get(ability['ability']['url'])
+        abilityData = json.loads(res.content)
+        description = abilityData['effect_entries'][1]['effect']
+        if len(description) > 200:
+            # truncate descriptions that are too long
+            description = description[:200]
+        newAbility = sqlalc.StoreAbility(abilityData['id'], abilityData['name'], description)
+        newAbilityRel = sqlalc.StoreAbilityRel(pokemoneid, abilityData['id'])
+        sqlalc.session.merge(newAbility)
+        sqlalc.session.merge(newAbilityRel)
+
+def updateTypeTable(pokemonid, types):
+    for type in types:
+        print(type)
+        newType = sqlalc.StoreType(typeDictionary[type['type']['name']], type['type']['name'])
+        newTypeRel = sqlalc.StoreTypeRel(pokemonid, typeDictionary[type['type']['name']])
+        sqlalc.session.merge(newType)
+        sqlalc.session.merge(newTypeRel)
 
 if __name__ == "__main__":
     app.run(debug=True)

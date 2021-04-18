@@ -73,6 +73,15 @@
             </div>
         {% endif %}
 
+        {% if ability != None %}
+            <div class="card container" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">{{ability.name}}</h5>
+                <p class="card-text">{{ability.description}}</p>
+              </div>
+            </div>
+        {% endif %}
+
         {% if displayNotFound %}
             <div class="alert alert-danger" role="alert">
               {{search}} not found in database

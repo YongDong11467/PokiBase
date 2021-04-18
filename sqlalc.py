@@ -77,6 +77,92 @@ class StoreMove(Base):
         return "<StoreMove(moveid='{0}', typeid='{1}', name='{2}', description='{3}', accuracy'{4}', power'{5}')>".format(
             self.moveid, self.typeid, self.name, self.description, self.accuracy, self.power)
 
+class StoreAbilityRel(Base):
+
+    __tablename__ = 'abilityrel'
+
+    pokemonid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    abilityid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+
+    def __init__(self, pokemonid, abilityid):
+        self.pokemonid = pokemonid
+        self.abilityid = abilityid
+
+    def __repr__(self):
+        return "<StoreAbilityRel(pokemonid='{0}', abilityid='{1}'>".format(
+            self.pokemonid, self.abilityid)
+
+class StoreAbility(Base):
+
+    __tablename__ = 'ability'
+
+    abilityid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    name = sqlalchemy.Column(sqlalchemy.String(length=50))
+    description = sqlalchemy.Column(sqlalchemy.String(length=200))
+
+    def __init__(self, abilityid, name, description):
+        self.abilityid = abilityid
+        self.name = name
+        self.description = description
+
+    def __repr__(self):
+        return "<StoreAbility(abilityid='{0}', name='{1}', description='{2}')>".format(
+            self.abilityid, self.name, self.description)
+
+class StoreTypeRel(Base):
+
+    __tablename__ = 'typerel'
+
+    pokemonid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    typeid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+
+    def __init__(self, pokemonid, typeid):
+        self.pokemonid = pokemonid
+        self.typeid = typeid
+
+    def __repr__(self):
+        return "<StoreTypeRel(pokemonid='{0}', typeid='{1}'>".format(
+            self.pokemonid, self.typeid)
+
+class StoreType(Base):
+
+    __tablename__ = 'type'
+
+    typeid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    name = sqlalchemy.Column(sqlalchemy.String(length=50))
+
+    def __init__(self, typeid, name):
+        self.typeid = typeid
+        self.name = name
+
+    def __repr__(self):
+        return "<StoreType(abilityid='{0}', name='{1}')>".format(
+            self.abilityid, self.name)
+
+class StoreStat(Base):
+
+    __tablename__ = 'stat'
+
+    statid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    hp = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    atk = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    defense = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    spatk = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    spdef = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    spd = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+
+    def __init__(self, statid, hp, atk, defense, spatk, spdef, spd):
+        self.statid = statid
+        self.hp = hp
+        self.atk = atk
+        self.defense = defense
+        self.spatk = spatk
+        self.spdef = spdef
+        self.spd = spd
+
+    def __repr__(self):
+        return "<StoreType(statid='{0}', hp='{1}', atk='{2}', defense='{3}', spatk='{4}', spdef='{5}', spd='{6}')>".format(
+            self.statid, self.hp, self.atk, self.defense, self.spatk, self.spdef, self.spd)
 
 Base.metadata.create_all(engine)  # creates the stores table
 
@@ -100,3 +186,11 @@ def getMove(name):
     #     print(err.msg)
     # for x in cursor:
     #     print(x)
+
+def getAbility(name):
+    query = """Select * from ability where ability.name = %s"""
+    arg = (name)
+    result_proxy = connection.execute(query, arg)
+
+    results = result_proxy.fetchall()
+    return results[0]
