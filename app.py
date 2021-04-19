@@ -2,6 +2,7 @@ from flask import Flask, render_template, url_for, request, session, redirect
 import sqlalc
 import requests
 import json
+import sqlprep
 app = Flask(__name__)
 app.secret_key = "qwertyuiop"
 
@@ -115,12 +116,68 @@ def updateMovesTable(pokemoneid, moves):
 
 @app.route('/edit', methods=['GET', 'POST'])
 def edit():
+    if not 'curteam' in session:
+        session['curteam'] = []
+    if not 'curteamimg' in session:
+        session['curteamimg'] = []
+
+    curteam = session['curteam']
+    curteamimg = session['curteamimg']
+
+
+
+    """ curTeamSet = [ ([0] * len(curteam)) for row in range(50) ]
+
+    for i in range(len(curteam)):
+        moveSet = sqlprep.getMovesFromName(curteam[i])
+        curTeamSet[i] = curteam[i]
+        for j in range(len(moveSet)):
+            curTeamSet[i][].append(moveSet[j])
+
+    print(curTeamSet) """
+
+
+    curTeamSet = [([0] * len(curteam)) for row in range(len(curteam))] 
+    
+    i = 0   
+    for pokemon in curteam:
+        #print(pokemon)
+        moveSet = sqlprep.getMovesFromName(pokemon)
+        #print(moveSet)
+        #curTeamSet[i][0] = pokemon
+        curTeamSet[i][0] = curteamimg[i]
+        #print(pokemon + str(i))
+        curTeamSet[i].append(moveSet)
+        #curTeamSet[i].pop()
+        i = i + 1
+        """ for move in moveSet:
+            curTeamSet[i].append(move)
+            print(move)
+        i = i + 1 """
+
+    
+     
     #if request.method == "GET":
+
+    #print(len(curTeamSet))
+    #print(curTeamSet)
+    #print(curteamimg)
+    #l = 0
+    #for k in curTeamSet[l]:
+    #    print(k)
 
     #finds pokemon to get removed
     #TODO add backend functionality
-    if request.method == "POST":   
-        if request.form["remove"] == "0":
+    #TODO if go to edit without a team
+    if request.method == "POST": 
+        print(request.form)
+        print(request.form["remove"])
+        #get pokemon id to remove
+        remove_id = request.form["remove"][73:-4] 
+        print(remove_id)
+        #print(sqlprep.getMoves(remove_id))
+        moveSet = sqlprep.getMoves(remove_id)
+        """ if request.form["remove"] == "0":
            print("Remove0")
         if request.form["remove"] == "1":
            print("Remove1")
@@ -131,8 +188,8 @@ def edit():
         if request.form["remove"] == "4":
            print("Remove4")
         if request.form["remove"] == "5":
-           print("Remove5")   
-    return render_template("edit.html")    
+           print("Remove5")  """  
+    return render_template("edit.html", curteamimg=curteamimg, moveSet = moveSet, curTeamSet = curTeamSet, length = len(curteam))    
 
 if __name__ == "__main__":
     app.run(debug=True)
