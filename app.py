@@ -134,8 +134,28 @@ def updateMovesTable(pokemoneid, moves):
         newMoveRel = sqlalc.StoreMoveRel(pokemoneid, moveData['id'])
         sqlalc.session.merge(newMove)
         sqlalc.session.merge(newMoveRel)
+    
+def updateAbilityTable(pokemoneid, abilities):
+    for ability in abilities:
+        res = requests.get(ability['ability']['url'])
+        abilityData = json.loads(res.content)
+        description = abilityData['effect_entries'][1]['effect']
+        if len(description) > 200:
+            # truncate descriptions that are too long
+            description = description[:200]
+        newAbility = sqlalc.StoreAbility(abilityData['id'], abilityData['name'], description)
+        newAbilityRel = sqlalc.StoreAbilityRel(pokemoneid, abilityData['id'])
+        sqlalc.session.merge(newAbility)
+        sqlalc.session.merge(newAbilityRel)
 
-<<<<<<< HEAD
+def updateTypeTable(pokemonid, types):
+    for type in types:
+        print(type)
+        newType = sqlalc.StoreType(typeDictionary[type['type']['name']], type['type']['name'])
+        newTypeRel = sqlalc.StoreTypeRel(pokemonid, typeDictionary[type['type']['name']])
+        sqlalc.session.merge(newType)
+        sqlalc.session.merge(newTypeRel)
+
 @app.route('/edit', methods=['GET', 'POST'])
 def edit():
     if not 'curteam' in session:
@@ -211,29 +231,7 @@ def edit():
            print("Remove4")
         if request.form["remove"] == "5":
            print("Remove5")  """  
-    return render_template("edit.html", curteamimg=curteamimg, moveSet = moveSet, curTeamSet = curTeamSet, length = len(curteam))    
-=======
-def updateAbilityTable(pokemoneid, abilities):
-    for ability in abilities:
-        res = requests.get(ability['ability']['url'])
-        abilityData = json.loads(res.content)
-        description = abilityData['effect_entries'][1]['effect']
-        if len(description) > 200:
-            # truncate descriptions that are too long
-            description = description[:200]
-        newAbility = sqlalc.StoreAbility(abilityData['id'], abilityData['name'], description)
-        newAbilityRel = sqlalc.StoreAbilityRel(pokemoneid, abilityData['id'])
-        sqlalc.session.merge(newAbility)
-        sqlalc.session.merge(newAbilityRel)
-
-def updateTypeTable(pokemonid, types):
-    for type in types:
-        print(type)
-        newType = sqlalc.StoreType(typeDictionary[type['type']['name']], type['type']['name'])
-        newTypeRel = sqlalc.StoreTypeRel(pokemonid, typeDictionary[type['type']['name']])
-        sqlalc.session.merge(newType)
-        sqlalc.session.merge(newTypeRel)
->>>>>>> origin/main
+    return render_template("edit.html", curteamimg=curteamimg, moveSet = moveSet, curTeamSet = curTeamSet, length = len(curteam))
 
 if __name__ == "__main__":
     app.run(debug=True)
