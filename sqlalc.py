@@ -164,6 +164,36 @@ class StoreStat(Base):
         return "<StoreType(statid='{0}', hp='{1}', atk='{2}', defense='{3}', spatk='{4}', spdef='{5}', spd='{6}')>".format(
             self.statid, self.hp, self.atk, self.defense, self.spatk, self.spdef, self.spd)
 
+class AddToTeam(Base):
+
+    __tablename__ = 'team'
+
+    teamid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    count = sqlalchemy.Column(sqlalchemy.Integer)
+
+    def __init__(self, teamid, count):
+        self.teamid = teamid
+        self.count = count
+
+    def __repr__(self):
+        return "<StoreTeam(teamid='{0}', count='{1}')>".format(
+            self.teamid, self.count) 
+
+class AddToTeamRel(Base):
+
+    __tablename__ = 'teamrel'
+
+    pokemonid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    teamid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+
+    def __init__(self, pokemonid, teamid):
+        self.pokemonid = pokemonid
+        self.teamid = teamid
+
+    def __repr__(self):
+        return "<StoreTeamRel(pokemonid='{0}', teamid='{1}'>".format(
+            self.pokemonid, self.teamid)                  
+
 Base.metadata.create_all(engine)  # creates the stores table
 
 # Create a session

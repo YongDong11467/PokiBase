@@ -19,15 +19,22 @@ cursor = cnx.cursor()
 def removeFromTeam(team, pokemon):
     #removes pokemon from team
     #teamid = team, pokemonid = pokemon
-    stmt1 = "DELETE FROM teamrel WHERE teamid =%s and pokemonid=%s"
+    stmt1 = "DELETE FROM pokibase.teamrel WHERE teamid =%s and pokemonid=%s"
 
     #gets count of team
-    stmt2 = "SELECT count from team where teamid =%s"
+    stmt2 = "SELECT count from pokibase.team where teamid =%s"
+    
     #updates count of team
     #count = new count, teamid = team
-    stmt3 = "UPDATE team SET count=%s WHERE teamid=%s" #could make this a trigger
+    stmt3 = "UPDATE pokibase.team SET count=%s WHERE teamid=%s" #could make this a trigger
 
     cursor.execute(stmt1, (team, pokemon))
+    cursor.execute(stmt2, (team,))
+    cnt = cursor.fetchone()
+    
+    cnt = cnt[0] - 1
+    
+    cursor.execute(stmt3, (cnt, team))
     cnx.commit()
 
 def getMoves(pokemon):

@@ -30,9 +30,9 @@
                         {% for j in range(0,4) %}
                             <label for="move">Choose move:</label>
                             <select name="move" id="move">
-                            {% for k in range(0,2) %} 
+                            {% for k in range(0,length) %} 
                                 {% if curTeamSet[k][0] == i %}
-                                    {% for m in curTeamSet[k][2] %}
+                                    {% for m in curTeamSet[k][1] %}
                                         <option value="{{ m }}">{{ m }}</option>
                                     {% endfor %}
                                 {% endif %}

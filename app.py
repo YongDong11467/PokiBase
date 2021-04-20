@@ -31,6 +31,16 @@ typeDictionary = {
     'shadow': 10002}
 data = []
 
+#pokemonid of last searched, used for add to team
+#if add to team must be most recently searched
+mostRecentPokemon = -1
+
+#Sets number of possible teams in the database
+numberOfTeams = 3
+
+#Current team id of session
+currentTeamID = 1
+
 #TODO: Create a session
 #TODO: Organize files with blueprint
 
@@ -73,6 +83,9 @@ def team():
                 updateAbilityTable(pokemon['id'], pokemon['abilities'])
                 updateTypeTable(pokemon['id'], pokemon['types'])
                 sqlalc.session.commit()
+                #sets most recently searched
+                global mostRecentPokemon
+                mostRecentPokemon = pokemon['id']
             elif search is not None:
                 displayNotFound = True
         elif option == 'Move':
@@ -109,6 +122,13 @@ def addtoteam():
         session['curteam'] = curteam
         print(session["curteam"])
         # print(session["curteam"]["sprites"]["front_default"])
+        #adds to team and teamid sql tables
+        global currentTeamID
+        newTeamMember = sqlalc.AddToTeam(currentTeamID, len(curteam))
+        newTeamMemberRel = sqlalc.AddToTeamRel(mostRecentPokemon, currentTeamID)
+        sqlalc.session.merge(newTeamMember)
+        sqlalc.session.merge(newTeamMemberRel)
+        sqlalc.session.commit()
     if 'curimageRef' in session:
         curteamimg.append(session['curimageRef'])
         session['curteamimg'] = curteamimg
@@ -166,20 +186,7 @@ def edit():
     curteam = session['curteam']
     curteamimg = session['curteamimg']
 
-
-
-    """ curTeamSet = [ ([0] * len(curteam)) for row in range(50) ]
-
-    for i in range(len(curteam)):
-        moveSet = sqlprep.getMovesFromName(curteam[i])
-        curTeamSet[i] = curteam[i]
-        for j in range(len(moveSet)):
-            curTeamSet[i][].append(moveSet[j])
-
-    print(curTeamSet) """
-
-
-    curTeamSet = [([0] * len(curteam)) for row in range(len(curteam))] 
+    curTeamSet = [[0] * 1 for row in range(len(curteam))] 
     
     i = 0   
     for pokemon in curteam:
@@ -192,45 +199,29 @@ def edit():
         curTeamSet[i].append(moveSet)
         #curTeamSet[i].pop()
         i = i + 1
-        """ for move in moveSet:
-            curTeamSet[i].append(move)
-            print(move)
-        i = i + 1 """
-
-    
-     
-    #if request.method == "GET":
-
-    #print(len(curTeamSet))
-    #print(curTeamSet)
-    #print(curteamimg)
-    #l = 0
-    #for k in curTeamSet[l]:
-    #    print(k)
 
     #finds pokemon to get removed
     #TODO add backend functionality
     #TODO if go to edit without a team
     if request.method == "POST": 
-        print(request.form)
-        print(request.form["remove"])
+        #print(request.form)
+        #print(request.form["remove"])
+
         #get pokemon id to remove
         remove_id = request.form["remove"][73:-4] 
-        print(remove_id)
-        #print(sqlprep.getMoves(remove_id))
-        moveSet = sqlprep.getMoves(remove_id)
-        """ if request.form["remove"] == "0":
-           print("Remove0")
-        if request.form["remove"] == "1":
-           print("Remove1")
-        if request.form["remove"] == "2":
-           print("Remove2")
-        if request.form["remove"] == "3":
-           print("Remove3")
-        if request.form["remove"] == "4":
-           print("Remove4")
-        if request.form["remove"] == "5":
-           print("Remove5")  """  
+
+        #image path to match with curteamimg, get index
+        index = (curteamimg.index(request.form["remove"]))
+        
+        #removes pokemon
+        curteam.pop(index)
+        curteamimg.pop(index)
+        session['curteam'] = curteam
+        session['curteamimg'] = curteamimg
+        sqlprep.removeFromTeam(currentTeamID, remove_id)
+
+        return redirect(url_for("edit"))
+         
     return render_template("edit.html", curteamimg=curteamimg, moveSet = moveSet, curTeamSet = curTeamSet, length = len(curteam))
 
 if __name__ == "__main__":
