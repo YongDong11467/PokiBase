@@ -91,6 +91,9 @@ def team():
         elif option == 'Move':
             print("Getting move")
             move = sqlalc.getMove(search)
+            if not move:
+                move = None
+                displayNotFound = True
             # res = requests.get(baseUrl + f'move/{search}')
             # print(baseUrl + f'move/{search}')
             # if res.content != b'Not Found':

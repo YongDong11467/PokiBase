@@ -2,6 +2,7 @@
 
 import mysql.connector
 import sqlalchemy
+from sqlalchemy import Index
 from sqlalchemy.ext.declarative import declarative_base
 
 # Do not forget to install mysql.connector and sqlalchemy
@@ -44,7 +45,7 @@ class StoreMoveRel(Base):
     __tablename__ = 'moverel'
 
     pokemonid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    moveid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    moveid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, index=True)
 
     def __init__(self, pokemonid, moveid):
         self.pokemonid = pokemonid
@@ -60,7 +61,7 @@ class StoreMove(Base):
 
     moveid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     typeid = sqlalchemy.Column(sqlalchemy.Integer)
-    name = sqlalchemy.Column(sqlalchemy.String(length=50))
+    name = sqlalchemy.Column(sqlalchemy.String(length=50), index=True)
     description = sqlalchemy.Column(sqlalchemy.String(length=200))
     accuracy = sqlalchemy.Column(sqlalchemy.Integer)
     power = sqlalchemy.Column(sqlalchemy.Integer)
@@ -97,7 +98,7 @@ class StoreAbility(Base):
     __tablename__ = 'ability'
 
     abilityid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    name = sqlalchemy.Column(sqlalchemy.String(length=50))
+    name = sqlalchemy.Column(sqlalchemy.String(length=50), index=True)
     description = sqlalchemy.Column(sqlalchemy.String(length=200))
 
     def __init__(self, abilityid, name, description):
@@ -203,12 +204,23 @@ session = Session()
 
 connection = engine.connect()
 
+# Only run once
+# idx_moveid = Index('idx_moveid', StoreMoveRel.moveid)
+# idx_movename = Index('idx_movename', StoreMove.name)
+# idx_abilityname = Index('idx_abilityname', StoreAbility.name)
+#
+# idx_moveid.create(bind=engine)
+# idx_movename.create(bind=engine)
+# idx_abilityname.create(bind=engine)
+
 def getMove(name):
     query = """Select * from move where move.name = %s"""
     arg = (name)
     result_proxy = connection.execute(query, arg)
 
     results = result_proxy.fetchall()
+    if not results:
+        return []
     return results[0]
     # try:
     #     cursor.execute(query, arg)
@@ -223,4 +235,6 @@ def getAbility(name):
     result_proxy = connection.execute(query, arg)
 
     results = result_proxy.fetchall()
+    if not results:
+        return []
     return results[0]
