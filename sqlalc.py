@@ -142,9 +142,9 @@ class StoreType(Base):
 
 class StoreStat(Base):
 
-    __tablename__ = 'stat'
+    __tablename__ = 'statv2'
 
-    statid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    pokemonid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     hp = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     atk = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     defense = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
@@ -152,8 +152,8 @@ class StoreStat(Base):
     spdef = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     spd = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
 
-    def __init__(self, statid, hp, atk, defense, spatk, spdef, spd):
-        self.statid = statid
+    def __init__(self, pokemonid, hp, atk, defense, spatk, spdef, spd):
+        self.pokemonid = pokemonid
         self.hp = hp
         self.atk = atk
         self.defense = defense
@@ -162,8 +162,8 @@ class StoreStat(Base):
         self.spd = spd
 
     def __repr__(self):
-        return "<StoreType(statid='{0}', hp='{1}', atk='{2}', defense='{3}', spatk='{4}', spdef='{5}', spd='{6}')>".format(
-            self.statid, self.hp, self.atk, self.defense, self.spatk, self.spdef, self.spd)
+        return "<StoreType(pokemonid='{0}', hp='{1}', atk='{2}', defense='{3}', spatk='{4}', spdef='{5}', spd='{6}')>".format(
+            self.pokemonid, self.hp, self.atk, self.defense, self.spatk, self.spdef, self.spd)
 
 class AddToTeam(Base):
 

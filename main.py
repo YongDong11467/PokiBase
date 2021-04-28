@@ -82,6 +82,7 @@ def team():
                 # updateMovesTable(pokemon['id'], pokemon['moves'])
                 updateAbilityTable(pokemon['id'], pokemon['abilities'])
                 updateTypeTable(pokemon['id'], pokemon['types'])
+                updateStatTable(pokemon['id'], pokemon['stats'])
                 sqlalc.session.commit()
                 #sets most recently searched
                 global mostRecentPokemon
@@ -178,6 +179,11 @@ def updateTypeTable(pokemonid, types):
         newTypeRel = sqlalc.StoreTypeRel(pokemonid, typeDictionary[type['type']['name']])
         sqlalc.session.merge(newType)
         sqlalc.session.merge(newTypeRel)
+
+def updateStatTable(pokemonid, stats):
+    newStat = sqlalc.StoreStat(pokemonid, stats[0]['base_stat'], stats[1]['base_stat'], stats[2]['base_stat'],
+                               stats[3]['base_stat'], stats[4]['base_stat'], stats[5]['base_stat'])
+    sqlalc.session.merge(newStat)
 
 @app.route('/edit', methods=['GET', 'POST'])
 def edit():
