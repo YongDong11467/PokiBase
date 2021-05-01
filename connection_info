@@ -1,0 +1,4 @@
+MyPassword ="12345"
+MyUser = "root" # usually 'root'
+MyHost = "@34.66.93.230:3306/" # e.g., IP address of a MySQL instance in Google Cloud Platform, or 'localhost' for a local MySQL database
+MyDatabase = "pokibase"
