@@ -1,5 +1,27 @@
 {% extends "base.html" %}
 {% block title %}Home Page{% endblock %}
 {% block content %}
-<h1>Hello Dimitry</h1>
+    <div class="container" id="team">
+        <div>
+            <h2>Your Team</h2>
+        </div>
+        <div class="justify-content-center">
+            <ul class="list-group list-group-horizontal justify-content-center">
+                {% for i in range(0, curteamimg|length) %}
+                <li class="list-group-item">
+                    <div>
+    <!--                            <img src="{{ url_for('static', filename='./images/unknown.png')}}"  width="100" height="100">-->
+                        <img src="{{curteamimg[i]}}" width="100" height="100">
+                    </div>
+                    <div>
+                        <span>{{curteam[i]}}</span>
+                        <br>
+    <!--                            <span class="badge bg-secondary">Normal</span>-->
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            <a class="btn btn-primary" type="button" href="/commentonteam">Add Comment</a>
+        </div>
+    </div>
 {% endblock %}

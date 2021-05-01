@@ -46,7 +46,14 @@ currentTeamID = 1
 
 @app.route('/')
 def home():
-    return render_template("home.html")
+    if not 'curteam' in session:
+        session['curteam'] = []
+    if not 'curteamimg' in session:
+        session['curteamimg'] = []
+
+    curteam = session['curteam']
+    curteamimg = session['curteamimg']
+    return render_template("home.html", curteam = curteam, curteamimg = curteamimg)
 
 @app.route('/team', methods=['GET', 'POST'])
 def team():
@@ -127,12 +134,13 @@ def addtoteam():
         print(session["curteam"])
         # print(session["curteam"]["sprites"]["front_default"])
         #adds to team and teamid sql tables
-        global currentTeamID
-        newTeamMember = sqlalc.AddToTeam(currentTeamID, len(curteam))
-        newTeamMemberRel = sqlalc.AddToTeamRel(mostRecentPokemon, currentTeamID)
-        sqlalc.session.merge(newTeamMember)
-        sqlalc.session.merge(newTeamMemberRel)
-        sqlalc.session.commit()
+
+        #global currentTeamID
+        #newTeamMember = sqlalc.AddToTeam(currentTeamID, len(curteam))
+        #newTeamMemberRel = sqlalc.AddToTeamRel(mostRecentPokemon, currentTeamID)
+        #sqlalc.session.merge(newTeamMember)
+        #sqlalc.session.merge(newTeamMemberRel)
+        #sqlalc.session.commit()
     if 'curimageRef' in session:
         curteamimg.append(session['curimageRef'])
         session['curteamimg'] = curteamimg
@@ -144,6 +152,10 @@ def clearteam():
     session.pop("curteam", None)
     session.pop("curteamimg", None)
     return redirect(url_for("team"))
+
+@app.route('/commentonteam')
+def commentonteam():
+    return redirect(url_for("home"))
 
 def updateMovesTable(pokemoneid, moves):
     for move in moves:
