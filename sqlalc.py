@@ -193,7 +193,22 @@ class AddToTeamRel(Base):
 
     def __repr__(self):
         return "<StoreTeamRel(pokemonid='{0}', teamid='{1}'>".format(
-            self.pokemonid, self.teamid)                  
+            self.pokemonid, self.teamid)
+
+class AddToComment(Base):
+
+    __tablename__ = 'comment'
+
+    teamid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    description = sqlalchemy.Column(sqlalchemy.String(length=300))
+
+    def __init__(self, teamid, description):
+        self.teamid = teamid
+        self.description = description
+
+    def __repr__(self):
+        return "<AddToComment(teamid='{0}', description='{1}')>".format(
+            self.teamid, self.description)                  
 
 Base.metadata.create_all(engine)  # creates the stores table
 

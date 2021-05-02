@@ -14,7 +14,7 @@ cnx = mysql.connector.connect(user='root', password=connection_info.MyPassword,
                               host=connection_info.MyHost[1:-6],
                               database=connection_info.MyDatabase)
 
-cursor = cnx.cursor()
+cursor = cnx.cursor(buffered=True)
 
 def removeFromTeam(team, pokemon):
     #removes pokemon from team
@@ -56,3 +56,27 @@ def getMovesFromName(pokemonID):
     if len(moveSet) == 0:
         moveSet.append("No Moves")
     return moveSet
+
+def getTeams():
+    stmt = "SELECT DISTINCT teamid FROM teamrel"
+    cursor.execute(stmt)
+    team_ids = []
+    #print(cursor)
+    if cursor.rowcount == 0:
+        team_ids.append(-1)
+        return team_ids
+    for team in cursor:
+        #print("TEAM ID:" + str(team)[1:2])
+        team_ids.append(str(team)[1:2])
+        
+    return team_ids
+
+def getTeamPokemon(teamId):
+    stmt = "SELECT DISTINCT p.pokemonname FROM teamrel t JOIN pokemon p on t.pokemonid = p.pokemonid WHERE t.teamid =%s"
+    cursor.execute(stmt, (teamId,))
+    pokemon_names = []
+    for pokemon in cursor:
+        print(str(pokemon)[2:len(str(pokemon))-3])
+        pokemon_names.append(str(pokemon)[2:len(str(pokemon))-3])
+    
+    return pokemon_names

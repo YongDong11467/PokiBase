@@ -1,5 +1,45 @@
 {% extends "base.html" %}
 {% block title %}Home Page{% endblock %}
 {% block content %}
-<h1>Hello Dimitry</h1>
+    <div class="container" id="team">
+        <div>
+            <h2>Welcome to Pokibase</h2>
+        </div>
+        {% if teamimgs != None %}
+            <div class="justify-content-center">
+                <ul class="list-group list-group-horizontal justify-content-center">
+                    {% for j in range(0, teams|length) %}
+                        {% for i in range(0, teamimgs[j]|length) %}
+                        <li class="list-group-item">
+                            <div>
+            <!--                            <img src="{{ url_for('static', filename='./images/unknown.png')}}"  width="100" height="100">-->
+                                <img src="{{teamimgs[j][i]}}" width="100" height="100">
+                            </div>
+                            <div>
+                                <span>{{teamnames[j][i]}}</span>
+                                <br>
+            <!--                            <span class="badge bg-secondary">Normal</span>-->
+                            </div>
+                        </li>
+                        {% endfor %}
+                        <!--<a class="btn btn-primary" type="button" href="/commentonteam">Add Comment</a>-->
+                        <div class="mt-5 container">
+                            <div class="row">
+                                <form class="form-inline" action="/" method="GET">
+                                    <div class="col-auto">
+                                        <!--<label for="comment"> Comment:</label>-->
+                                        <!--<textarea class="form-control" rows="3" id="comment"></textarea>-->
+                                        <input class="form-control" type="text" name="Comment" placeholder="Comment on team" value="{{search if search}}" aria-label="Search">
+                                    </div>
+                                    <div class="col-auto">
+                                        <button class="btn btn-outline-success" type="submit" value="submit">Comment</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        {%endif %}
+    </div>
 {% endblock %}

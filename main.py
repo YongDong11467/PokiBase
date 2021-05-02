@@ -46,7 +46,33 @@ currentTeamID = 1
 
 @app.route('/')
 def home():
-    return render_template("home.html")
+    team_ids = sqlprep.getTeams()
+    if team_ids[0] != -1:
+        pokemon_imgs = [] 
+        pokemon_names = []
+        team_count = 0
+        pokemon_count = 0
+        for team in team_ids:
+            names = sqlprep.getTeamPokemon(team)
+            curr_team_imgs = []
+            for pokemon in names:
+                res = requests.get(baseUrl + f'pokemon/{pokemon}')
+                #print("THE FOLLOWING IS BASE URL:\n" + baseUrl + f'pokemon/{pokemon}')
+                if res.content != b'Not Found':
+                    #print("hi")
+                    curr_pokemon = json.loads(res.content)
+                    curr_team_imgs.append(curr_pokemon["sprites"]["front_default"])
+                else :
+                    print("bye")
+                pokemon_count = pokemon_count+1
+            team_count = team_count + 1
+            pokemon_imgs.append(curr_team_imgs)
+            pokemon_names.append(names)
+        return render_template("home.html", teams = team_ids, teamnames = pokemon_names, teamimgs = pokemon_imgs)
+
+    else:
+        print("bye2")
+        return render_template("home.html", teams = None, teamimgs = None)
 
 @app.route('/team', methods=['GET', 'POST'])
 def team():
@@ -69,7 +95,8 @@ def team():
         print(option)
         if option == 'Pokemon':
             res = requests.get(baseUrl + f'pokemon/{search}')
-            print(baseUrl + f'pokemon/{search}')
+            print("THE FOLLOWING IS BASE URL:\n" + baseUrl + f'pokemon/{search}')
+            #print("SEARCH:" + search)
             if res.content != b'Not Found':
                 print("Pokemon founded!")
                 pokemon = json.loads(res.content)
@@ -90,7 +117,7 @@ def team():
             elif search is not None:
                 displayNotFound = True
         elif option == 'Move':
-            print("Getting move")
+            #print("Getting move")
             move = sqlalc.getMove(search)
             if not move:
                 move = None
@@ -108,7 +135,7 @@ def team():
 
 @app.route('/addtoteam')
 def addtoteam():
-    print("in add team")
+    #print("in add team")
     if not 'curteam' in session:
         session['curteam'] = []
     if not 'curteamimg' in session:
@@ -121,22 +148,23 @@ def addtoteam():
         return redirect(url_for("team"))
 
     if 'curpokemon' in session:
-        print("in if")
+        #print("in if")
         curteam.append(session['curpokemon'])
         session['curteam'] = curteam
-        print(session["curteam"])
+        #print(session["curteam"])
         # print(session["curteam"]["sprites"]["front_default"])
         #adds to team and teamid sql tables
-        global currentTeamID
-        newTeamMember = sqlalc.AddToTeam(currentTeamID, len(curteam))
-        newTeamMemberRel = sqlalc.AddToTeamRel(mostRecentPokemon, currentTeamID)
-        sqlalc.session.merge(newTeamMember)
-        sqlalc.session.merge(newTeamMemberRel)
-        sqlalc.session.commit()
+
+        #global currentTeamID
+        #newTeamMember = sqlalc.AddToTeam(currentTeamID, len(curteam))
+        #newTeamMemberRel = sqlalc.AddToTeamRel(mostRecentPokemon, currentTeamID)
+        #sqlalc.session.merge(newTeamMember)
+        #sqlalc.session.merge(newTeamMemberRel)
+        #sqlalc.session.commit()
     if 'curimageRef' in session:
         curteamimg.append(session['curimageRef'])
         session['curteamimg'] = curteamimg
-        print(session["curteamimg"])
+        #print(session["curteamimg"])
     return redirect(url_for("team"))
 
 @app.route('/clearteam')
@@ -144,6 +172,10 @@ def clearteam():
     session.pop("curteam", None)
     session.pop("curteamimg", None)
     return redirect(url_for("team"))
+
+@app.route('/commentonteam')
+def commentonteam():
+    return redirect(url_for("home"))
 
 def updateMovesTable(pokemoneid, moves):
     for move in moves:
