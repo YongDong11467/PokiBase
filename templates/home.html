@@ -22,7 +22,21 @@
                             </div>
                         </li>
                         {% endfor %}
-                        <a class="btn btn-primary" type="button" href="/commentonteam">Add Comment</a>
+                        <!--<a class="btn btn-primary" type="button" href="/commentonteam">Add Comment</a>-->
+                        <div class="mt-5 container">
+                            <div class="row">
+                                <form class="form-inline" action="/" method="GET">
+                                    <div class="col-auto">
+                                        <!--<label for="comment"> Comment:</label>-->
+                                        <!--<textarea class="form-control" rows="3" id="comment"></textarea>-->
+                                        <input class="form-control" type="text" name="Comment" placeholder="Comment on team" value="{{search if search}}" aria-label="Search">
+                                    </div>
+                                    <div class="col-auto">
+                                        <button class="btn btn-outline-success" type="submit" value="submit">Comment</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     {% endfor %}
                 </ul>
             </div>

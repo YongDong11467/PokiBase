@@ -14,7 +14,7 @@ cnx = mysql.connector.connect(user='root', password=connection_info.MyPassword,
                               host=connection_info.MyHost[1:-6],
                               database=connection_info.MyDatabase)
 
-cursor = cnx.cursor()
+cursor = cnx.cursor(buffered=True)
 
 def removeFromTeam(team, pokemon):
     #removes pokemon from team
