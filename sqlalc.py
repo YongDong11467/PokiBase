@@ -185,14 +185,23 @@ class AddToTeamRel(Base):
 
     pokemonid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     teamid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    moveid1 = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    moveid2 = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    moveid3 = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    moveid4 = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
 
-    def __init__(self, pokemonid, teamid):
+    def __init__(self, pokemonid, teamid, moveid1, moveid2, moveid3, moveid4):
         self.pokemonid = pokemonid
         self.teamid = teamid
+        self.moveid1 = moveid1
+        self.moveid2 = moveid2
+        self.moveid3 = moveid3
+        self.moveid4 = moveid4
+
 
     def __repr__(self):
-        return "<StoreTeamRel(pokemonid='{0}', teamid='{1}'>".format(
-            self.pokemonid, self.teamid)                  
+        return "<StoreTeamRel(pokemonid='{0}', teamid='{1}', moveid1='{2}', moveid2='{3}', moveid3='{4}', moveid4='{5}'>".format(
+            self.pokemonid, self.teamid, self.moveid1, self.moveid2, self.moveid3, self.moveid4)                  
 
 Base.metadata.create_all(engine)  # creates the stores table
 
