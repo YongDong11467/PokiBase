@@ -3,25 +3,29 @@
 {% block content %}
     <div class="container" id="team">
         <div>
-            <h2>Your Team</h2>
+            <h2>Welcome to Pokibase</h2>
         </div>
-        <div class="justify-content-center">
-            <ul class="list-group list-group-horizontal justify-content-center">
-                {% for i in range(0, curteamimg|length) %}
-                <li class="list-group-item">
-                    <div>
-    <!--                            <img src="{{ url_for('static', filename='./images/unknown.png')}}"  width="100" height="100">-->
-                        <img src="{{curteamimg[i]}}" width="100" height="100">
-                    </div>
-                    <div>
-                        <span>{{curteam[i]}}</span>
-                        <br>
-    <!--                            <span class="badge bg-secondary">Normal</span>-->
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-            <a class="btn btn-primary" type="button" href="/commentonteam">Add Comment</a>
-        </div>
+        {% if teamimgs != None %}
+            <div class="justify-content-center">
+                <ul class="list-group list-group-horizontal justify-content-center">
+                    {% for j in range(0, teams|length) %}
+                        {% for i in range(0, teamimgs[j]|length) %}
+                        <li class="list-group-item">
+                            <div>
+            <!--                            <img src="{{ url_for('static', filename='./images/unknown.png')}}"  width="100" height="100">-->
+                                <img src="{{teamimgs[j][i]}}" width="100" height="100">
+                            </div>
+                            <div>
+                                <span>{{teamnames[j][i]}}</span>
+                                <br>
+            <!--                            <span class="badge bg-secondary">Normal</span>-->
+                            </div>
+                        </li>
+                        {% endfor %}
+                        <a class="btn btn-primary" type="button" href="/commentonteam">Add Comment</a>
+                    {% endfor %}
+                </ul>
+            </div>
+        {%endif %}
     </div>
 {% endblock %}
