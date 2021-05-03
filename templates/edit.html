@@ -43,8 +43,18 @@
                     {% endfor %}
                 </ul>
                 <a class="btn btn-primary" type="button" href="/clearteam">Clear team</a>
+                <a class="btn btn-primary" type="button" href="/submitTeam">Submit Team</a>
             </div>
         <div>
+            <div class="card container" style="width: 18rem;">
+                <p> Team Stats:
+                <div class="card-body">
+                  <h5 class="card-title">Average:</h5>
+                  {% for s in stats %}
+                    <p class="card-text">{{s}}</p>
+                  {% endfor %}   
+                </div>
+              </div>
             <div class="card container" style="width: 18rem;">
                 <p> Popular Choices:
                 <div class="card-body">

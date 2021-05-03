@@ -1,6 +1,7 @@
 #File for prepared statements
 #Main source is in code examples from lecture
 
+from random import randint
 import mysql.connector
 
 # Do not forget to install mysql.connector
@@ -87,10 +88,22 @@ def getTopFive():
         topFive.append("NA")
     return topFive
 
-def aggregateTeam(team):
-    stmt = """select *
-    from pokibase.pokemon as p, pokibase.teamrel as r, pokibase.team as t
-    where p.pokemonid = r.pokemonid and r.teamid = t.teamid and t.teamid = 2;"""
+def aggregateTeamStats(teamID):
+    stmt = """
+    SELECT avg(hp), avg(atk), avg(defense), avg(spatk), avg(spdef), avg(spd) 
+    FROM pokibase.statv2 as s Join pokibase.teamrel as r
+    On s.pokemonid = r.pokemonid 
+    where r.teamid = %s"""
+    cursor.execute(stmt, (teamID,))
+    stats = []
+    labels = ["hp: ", "atk: ", "defense: ", "spatk: ", "spdef: ", "spd: "]
+    for s in cursor:
+        print(s)
+        for i in range(0,6):
+            stats.append(labels[i] + str(s[i]))
+    if len(stats) == 0:
+        stats.append("NA")
+    return stats
 
 def getPokemonFromName(name):
     stmt = "SELECT pokemonid FROM pokibase.pokemon where pokemonname=%s;"
@@ -204,3 +217,26 @@ def getTeamPokemon(teamId):
         pokemon_names.append(str(pokemon)[2:len(str(pokemon))-3])
     
     return pokemon_names
+
+def getNumberForTeamID(maxTeams):
+    stmt = "SELECT teamid FROM pokibase.team;"
+    cursor.execute(stmt)
+    cnx.commit()
+    setOfTeams = set()
+    potentialTeams = set()
+    for t in cursor:
+        #print(t)
+        setOfTeams.add(t[0])
+    for i in range(1, maxTeams + 1):
+        potentialTeams.add(i)
+    unusedTeams = potentialTeams - setOfTeams
+    print(setOfTeams)
+    print("unused teams:")
+    print(unusedTeams)
+    if len(unusedTeams) == 0:
+        newID = randint(1,maxTeams)
+        deleteTeam(newID)
+        return newID
+    else:
+        return next(iter(unusedTeams))
+        

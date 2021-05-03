@@ -41,7 +41,9 @@ numberOfTeams = 10
 
 #Current team id of session
 #currentTeamID = 1
-currentTeamID = 3
+currentTeamID = sqlprep.getNumberForTeamID(numberOfTeams)
+print("(GLobal)currentTeamID:")
+print(currentTeamID)
 
 #TODO: Create a session
 #TODO: Organize files with blueprint
@@ -253,6 +255,8 @@ def edit():
     print(curteam)
     topFive = sqlprep.getTopFive()
     topFiveMoves = sqlprep.getTopFiveMoves()
+    stats = sqlprep.aggregateTeamStats(currentTeamID)
+    print(stats)
     #print(curTeamSet)
 
     #if request.method == "GET":
@@ -261,7 +265,7 @@ def edit():
         #print(request.form)
         #print(request.form["00"])
 
-    print(topFive)
+    #print(topFive)
 
     #finds pokemon to get removed and edits moves
     if request.method == "POST": 
@@ -342,8 +346,23 @@ def edit():
             return redirect(url_for("edit"))
         
   
-    return render_template("edit.html", curteamimg=curteamimg, curteam = curteam, curTeamSet2 = curTeamSet2, topFive=topFive, topFiveMoves = topFiveMoves)
+    return render_template("edit.html", curteamimg=curteamimg, curteam = curteam, curTeamSet2 = curTeamSet2, topFive=topFive, topFiveMoves = topFiveMoves, stats = stats)
 
+
+@app.route("/submitTeam")
+def submitTeam():
+    print("submittingteam")
+    global currentTeamID
+    global numberOfTeams
+    currentTeamID = sqlprep.getNumberForTeamID(numberOfTeams)
+    """ if currentTeamID == 10:
+        currentTeamID = 1
+    else :
+        currentTeamID = currentTeamID + 1 """
+    print("new team: " + str(currentTeamID))
+    session.pop("curteam", None)
+    session.pop("curteamimg", None)
+    return redirect(url_for("team"))
 
 if __name__ == "__main__":
     app.run(debug=True)
