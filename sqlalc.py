@@ -2,6 +2,7 @@
 
 import mysql.connector
 import sqlalchemy
+from sqlalchemy import Index
 from sqlalchemy.ext.declarative import declarative_base
 
 # Do not forget to install mysql.connector and sqlalchemy
@@ -44,7 +45,7 @@ class StoreMoveRel(Base):
     __tablename__ = 'moverel'
 
     pokemonid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    moveid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    moveid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, index=True)
 
     def __init__(self, pokemonid, moveid):
         self.pokemonid = pokemonid
@@ -60,7 +61,7 @@ class StoreMove(Base):
 
     moveid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     typeid = sqlalchemy.Column(sqlalchemy.Integer)
-    name = sqlalchemy.Column(sqlalchemy.String(length=50))
+    name = sqlalchemy.Column(sqlalchemy.String(length=50), index=True)
     description = sqlalchemy.Column(sqlalchemy.String(length=200))
     accuracy = sqlalchemy.Column(sqlalchemy.Integer)
     power = sqlalchemy.Column(sqlalchemy.Integer)
@@ -97,7 +98,7 @@ class StoreAbility(Base):
     __tablename__ = 'ability'
 
     abilityid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    name = sqlalchemy.Column(sqlalchemy.String(length=50))
+    name = sqlalchemy.Column(sqlalchemy.String(length=50), index=True)
     description = sqlalchemy.Column(sqlalchemy.String(length=200))
 
     def __init__(self, abilityid, name, description):
@@ -141,9 +142,9 @@ class StoreType(Base):
 
 class StoreStat(Base):
 
-    __tablename__ = 'stat'
+    __tablename__ = 'statv2'
 
-    statid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    pokemonid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     hp = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     atk = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     defense = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
@@ -151,8 +152,8 @@ class StoreStat(Base):
     spdef = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     spd = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
 
-    def __init__(self, statid, hp, atk, defense, spatk, spdef, spd):
-        self.statid = statid
+    def __init__(self, pokemonid, hp, atk, defense, spatk, spdef, spd):
+        self.pokemonid = pokemonid
         self.hp = hp
         self.atk = atk
         self.defense = defense
@@ -161,8 +162,8 @@ class StoreStat(Base):
         self.spd = spd
 
     def __repr__(self):
-        return "<StoreType(statid='{0}', hp='{1}', atk='{2}', defense='{3}', spatk='{4}', spdef='{5}', spd='{6}')>".format(
-            self.statid, self.hp, self.atk, self.defense, self.spatk, self.spdef, self.spd)
+        return "<StoreType(pokemonid='{0}', hp='{1}', atk='{2}', defense='{3}', spatk='{4}', spdef='{5}', spd='{6}')>".format(
+            self.pokemonid, self.hp, self.atk, self.defense, self.spatk, self.spdef, self.spd)
 
 class AddToTeam(Base):
 
@@ -203,6 +204,21 @@ class AddToTeamRel(Base):
         return "<StoreTeamRel(pokemonid='{0}', teamid='{1}', moveid1='{2}', moveid2='{3}', moveid3='{4}', moveid4='{5}'>".format(
             self.pokemonid, self.teamid, self.moveid1, self.moveid2, self.moveid3, self.moveid4)                  
 
+class AddToComment(Base):
+
+    __tablename__ = 'comment'
+
+    teamid = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    description = sqlalchemy.Column(sqlalchemy.String(length=300))
+
+    def __init__(self, teamid, description):
+        self.teamid = teamid
+        self.description = description
+
+    def __repr__(self):
+        return "<AddToComment(teamid='{0}', description='{1}')>".format(
+            self.teamid, self.description)                  
+
 Base.metadata.create_all(engine)  # creates the stores table
 
 # Create a session
@@ -212,12 +228,23 @@ session = Session()
 
 connection = engine.connect()
 
+# Only run once
+# idx_moveid = Index('idx_moveid', StoreMoveRel.moveid)
+# idx_movename = Index('idx_movename', StoreMove.name)
+# idx_abilityname = Index('idx_abilityname', StoreAbility.name)
+#
+# idx_moveid.create(bind=engine)
+# idx_movename.create(bind=engine)
+# idx_abilityname.create(bind=engine)
+
 def getMove(name):
     query = """Select * from move where move.name = %s"""
     arg = (name)
     result_proxy = connection.execute(query, arg)
 
     results = result_proxy.fetchall()
+    if not results:
+        return []
     return results[0]
     # try:
     #     cursor.execute(query, arg)
@@ -232,4 +259,6 @@ def getAbility(name):
     result_proxy = connection.execute(query, arg)
 
     results = result_proxy.fetchall()
+    if not results:
+        return []
     return results[0]
