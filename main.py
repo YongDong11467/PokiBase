@@ -1,4 +1,5 @@
 from flask import Flask, render_template, url_for, request, session, redirect
+from sqlalchemy.sql.type_api import NULLTYPE
 import sqlalc
 import requests
 import json
@@ -36,10 +37,11 @@ data = []
 mostRecentPokemon = -1
 
 #Sets number of possible teams in the database
-numberOfTeams = 3
+numberOfTeams = 10
 
 #Current team id of session
-currentTeamID = 1
+#currentTeamID = 1
+currentTeamID = 3
 
 #TODO: Create a session
 #TODO: Organize files with blueprint
@@ -162,13 +164,12 @@ def addtoteam():
         #print(session["curteam"])
         # print(session["curteam"]["sprites"]["front_default"])
         #adds to team and teamid sql tables
-
-        #global currentTeamID
-        #newTeamMember = sqlalc.AddToTeam(currentTeamID, len(curteam))
-        #newTeamMemberRel = sqlalc.AddToTeamRel(mostRecentPokemon, currentTeamID)
-        #sqlalc.session.merge(newTeamMember)
-        #sqlalc.session.merge(newTeamMemberRel)
-        #sqlalc.session.commit()
+        global currentTeamID
+        newTeamMember = sqlalc.AddToTeam(currentTeamID, len(curteam))
+        newTeamMemberRel = sqlalc.AddToTeamRel(mostRecentPokemon, currentTeamID, "-1", "-1", "-1", "-1")
+        sqlalc.session.merge(newTeamMember)
+        sqlalc.session.merge(newTeamMemberRel)
+        sqlalc.session.commit()
     if 'curimageRef' in session:
         curteamimg.append(session['curimageRef'])
         session['curteamimg'] = curteamimg
@@ -179,6 +180,7 @@ def addtoteam():
 def clearteam():
     session.pop("curteam", None)
     session.pop("curteamimg", None)
+    sqlprep.deleteTeam(currentTeamID)
     return redirect(url_for("team"))
 
 @app.route('/commentonteam')
@@ -251,29 +253,107 @@ def edit():
         #curTeamSet[i].pop()
         i = i + 1
 
-    #finds pokemon to get removed
-    #TODO add backend functionality
-    #TODO if go to edit without a team
-    if request.method == "POST": 
+    curTeamSet2 = [] 
+   
+    for pokemon in curteam:
+        moveSet = sqlprep.getMovesFromName(pokemon)
+        curTeamSet2.append(moveSet)
+
+    #print(curTeamSet2) 
+    print(curteam)
+    topFive = sqlprep.getTopFive()
+    topFiveMoves = sqlprep.getTopFiveMoves()
+    #print(curTeamSet)
+
+    #if request.method == "GET":
+        #returns ## where 1st number is pokemon index in curteam
+        #and 2nd number is the number of move
         #print(request.form)
-        #print(request.form["remove"])
+        #print(request.form["00"])
 
-        #get pokemon id to remove
-        remove_id = request.form["remove"][73:-4] 
+    print(topFive)
 
-        #image path to match with curteamimg, get index
-        index = (curteamimg.index(request.form["remove"]))
+    #finds pokemon to get removed and edits moves
+    if request.method == "POST": 
+        print(request.form)
+        #get what type of request it is
+        #gets the key and then uses it to get value
+        res2 = list(request.form)[0]
+        #need to check to see if not remove
+        #it's b/c remove only has index 0
+        #thus following 3 lines could cause out of bounds
+        res1 = "no"
+        if res2 != "remove":
+            res1 = list(request.form)[4]
         
-        #removes pokemon
-        curteam.pop(index)
-        curteamimg.pop(index)
-        session['curteam'] = curteam
-        session['curteamimg'] = curteamimg
-        sqlprep.removeFromTeam(currentTeamID, remove_id)
+        
+        if(res1 == "moves"):
+            print("moves")
+            #gets dictionary keys for moves (moves are the value)
+            s = []
+            for i in range(0,4):
+                s.append(list(request.form)[i])
+            
 
-        return redirect(url_for("edit"))
-         
-    return render_template("edit.html", curteamimg=curteamimg, moveSet = moveSet, curTeamSet = curTeamSet, length = len(curteam))
+            #gets index in curteam
+            print(s[0])
+            index = int(s[0][0])
+            #index = index[0]
+            print(index)
+            movesPokemon = curteam[index]
+            
+            #gets ID of pokemon
+            print(movesPokemon)
+            movesPokemonID = sqlprep.getPokemonFromName(movesPokemon)
+            pickedMoves = []
+
+            #get move id's
+            for i in range(0,4):
+                print(request.form[s[i]])
+                pickedMoves.append(sqlprep.getMoveIDFromMoveName(request.form[s[i]]))
+                #print(sqlprep.getMoveIDFromMoveName(s[i]))
+
+            #update teamrel table
+            print(currentTeamID, movesPokemonID, pickedMoves[0], pickedMoves[1], pickedMoves[2], pickedMoves[3])
+            sqlprep.updateMovesinTeamRel(currentTeamID, movesPokemonID, pickedMoves[0], pickedMoves[1], pickedMoves[2], pickedMoves[3])
+
+
+        
+        #except:
+            #print("no submit")
+        if res2 == "remove":
+            print("remove")
+
+            #the entire team is gone
+            if len(curteam) == 1:
+                return redirect(url_for("clearteam"))
+
+            #get pokemon id to remove
+            #remove_id = request.form["remove"][73:-4] 
+
+            #image path to match with curteamimg, get index
+            #index = (curteamimg.index(request.form["remove"]))
+
+            #print(curteam[request.form["remove"]])
+            #print(sqlprep.getPokemonFromName(curteam[request.form["remove"]]))
+            index = int(request.form["remove"])
+            print((curteam[index]))
+            removePokemon = curteam[index]
+            remove_id = sqlprep.getPokemonFromName(removePokemon)
+            
+            
+            #removes pokemon
+            curteam.pop(index)
+            curteamimg.pop(index)
+            session['curteam'] = curteam
+            session['curteamimg'] = curteamimg
+            sqlprep.removeFromTeam(currentTeamID, remove_id)
+            print("finished")
+            return redirect(url_for("edit"))
+        
+  
+    return render_template("edit.html", curteamimg=curteamimg, curteam = curteam, curTeamSet2 = curTeamSet2, topFive=topFive, topFiveMoves = topFiveMoves)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
