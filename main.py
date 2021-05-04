@@ -134,6 +134,36 @@ def team():
             #     print(move)
         elif option == 'Ability':
             ability = sqlalc.getAbility(search)
+    if request.method == "POST": 
+        print(request.form)
+        print("remove")
+
+        #the entire team is gone
+        if len(curteam) == 1:
+            return redirect(url_for("clearteam"))
+
+        #get pokemon id to remove
+        #remove_id = request.form["remove"][73:-4] 
+
+        #image path to match with curteamimg, get index
+        #index = (curteamimg.index(request.form["remove"]))
+
+        #print(curteam[request.form["remove"]])
+        #print(sqlprep.getPokemonFromName(curteam[request.form["remove"]]))
+        index = int(request.form["remove"])
+        print((curteam[index]))
+        removePokemon = curteam[index]
+        remove_id = sqlprep.getPokemonFromName(removePokemon)
+        
+        
+        #removes pokemon
+        curteam.pop(index)
+        curteamimg.pop(index)
+        session['curteam'] = curteam
+        session['curteamimg'] = curteamimg
+        sqlprep.removeFromTeam(currentTeamID, remove_id)
+        print("finished")
+        return redirect(url_for("team"))
     return render_template("team.html", pokemon=pokemon, move=move, ability=ability,
                            displayNotFound=displayNotFound, search=search, curteam=curteam, curteamimg=curteamimg)
 
