@@ -91,7 +91,7 @@ def home():
                 temp = session.new
                 currcomments[index_position[team]] = comment
 
-        print(currcomments)
+        #print(currcomments)
         all_comments = sqlprep.getComments()
         session['new_comments'] = currcomments
         #print(currcomments)
