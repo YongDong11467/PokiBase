@@ -43,8 +43,18 @@
                     {% endfor %}
                 </ul>
                 <a class="btn btn-primary" type="button" href="/clearteam">Clear team</a>
+                <a class="btn btn-primary" type="button" href="/submitTeam">Submit Team</a>
             </div>
         <div>
+            <div class="card container" style="width: 18rem;">
+                <p> Team Stats:
+                <div class="card-body">
+                  <h5 class="card-title">Average:</h5>
+                  {% for s in stats %}
+                    <p class="card-text">{{s}}</p>
+                  {% endfor %}   
+                </div>
+              </div>
             <div class="card container" style="width: 18rem;">
                 <p> Popular Choices:
                 <div class="card-body">
@@ -59,53 +69,6 @@
                 </div>
               </div> 
         </div>        
-
-
-            <!-- {%for h in k%}
-                                    <option value="{{ h }}">{{ h }}</option>
-                                    {%if h == 0 %}
-                                        <option value="{{ h }}">move</option>
-                                    {%endif%}
-                                {% endfor %} -->
-
-
-           <!-- <div class="justify-content-center">
-                <ul class="list-group list-group-horizontal justify-content-center">
-                    {% for i in range(0,6) %}
-                    <li class="list-group-item">
-                        <div>
-                            <img src="{{ url_for('static', filename='./images/unknown.png')}}"  width="100" height="100">
-                        </div>
-                        <div>
-                            <span>name</span>
-                            <br>
-                            <span class="badge bg-secondary">Normal</span>
-                        </div>
-
-                        <br> -->
-                        
-                        <!-- <button class="btn btn-primary" type="button" name="remove" value="remove">Remove</button> -->
-<!-- 
-                        <form class="form-inline" action="/edit" method="POST">
-                            <div class="col-auto">
-                                <button class="btn btn-primary" type="submit" name="remove" value="{{ i }}">Remove</button>
-                            </div>
-                        </form>
-                        <br>
-                        <br>
-                        {% for i in range(0,4) %}
-                            <label for="move">Choose move:</label>
-                            
-                            <select name="move" id="move">
-                            <option value="move1">Move1</option>
-                            <option value="move2">Move2</option>
-                            <option value="move3">Move3</option>
-                            
-                            </select>
-
-                        {% endfor %}
-                    </li>
-                    {% endfor %} -->
                 </ul>
             </div>
         </div>

@@ -39,9 +39,9 @@ mostRecentPokemon = -1
 #Sets number of possible teams in the database
 numberOfTeams = 10
 
-#Current team id of session
-#currentTeamID = 1
-currentTeamID = 3
+#Current team id 
+currentTeamID = sqlprep.getNumberForTeamID(numberOfTeams)
+print("(Global)currentTeamID: " + str(currentTeamID))
 
 #TODO: Create a session
 #TODO: Organize files with blueprint
@@ -155,6 +155,26 @@ def team():
             #     print(move)
         elif option == 'Ability':
             ability = sqlalc.getAbility(search)
+    if request.method == "POST": 
+        print(request.form)
+        #print("remove")
+
+        #the entire team is gone
+        if len(curteam) == 1:
+            return redirect(url_for("clearteam"))
+        index = int(request.form["remove"])
+        removePokemon = curteam[index]
+        remove_id = sqlprep.getPokemonFromName(removePokemon)
+        
+        
+        #removes pokemon
+        curteam.pop(index)
+        curteamimg.pop(index)
+        session['curteam'] = curteam
+        session['curteamimg'] = curteamimg
+        sqlprep.removeFromTeam(currentTeamID, remove_id)
+        print("finished")
+        return redirect(url_for("team"))
     return render_template("team.html", pokemon=pokemon, move=move, ability=ability,
                            displayNotFound=displayNotFound, search=search, curteam=curteam, curteamimg=curteamimg)
 
@@ -253,39 +273,16 @@ def edit():
     curteam = session['curteam']
     curteamimg = session['curteamimg']
 
-    curTeamSet = [[0] * 1 for row in range(len(curteam))] 
-    
-    i = 0   
-    for pokemon in curteam:
-        #print(pokemon)
-        moveSet = sqlprep.getMovesFromName(pokemon)
-        #print(moveSet)
-        #curTeamSet[i][0] = pokemon
-        curTeamSet[i][0] = curteamimg[i]
-        #print(pokemon + str(i))
-        curTeamSet[i].append(moveSet)
-        #curTeamSet[i].pop()
-        i = i + 1
-
     curTeamSet2 = [] 
    
+   #array of movesets for each pokemon in the team
     for pokemon in curteam:
         moveSet = sqlprep.getMovesFromName(pokemon)
         curTeamSet2.append(moveSet)
 
-    #print(curTeamSet2) 
-    print(curteam)
     topFive = sqlprep.getTopFive()
     topFiveMoves = sqlprep.getTopFiveMoves()
-    #print(curTeamSet)
-
-    #if request.method == "GET":
-        #returns ## where 1st number is pokemon index in curteam
-        #and 2nd number is the number of move
-        #print(request.form)
-        #print(request.form["00"])
-
-    print(topFive)
+    stats = sqlprep.aggregateTeamStats(currentTeamID)
 
     #finds pokemon to get removed and edits moves
     if request.method == "POST": 
@@ -325,16 +322,11 @@ def edit():
             for i in range(0,4):
                 print(request.form[s[i]])
                 pickedMoves.append(sqlprep.getMoveIDFromMoveName(request.form[s[i]]))
-                #print(sqlprep.getMoveIDFromMoveName(s[i]))
 
             #update teamrel table
             print(currentTeamID, movesPokemonID, pickedMoves[0], pickedMoves[1], pickedMoves[2], pickedMoves[3])
             sqlprep.updateMovesinTeamRel(currentTeamID, movesPokemonID, pickedMoves[0], pickedMoves[1], pickedMoves[2], pickedMoves[3])
 
-
-        
-        #except:
-            #print("no submit")
         if res2 == "remove":
             print("remove")
 
@@ -342,14 +334,6 @@ def edit():
             if len(curteam) == 1:
                 return redirect(url_for("clearteam"))
 
-            #get pokemon id to remove
-            #remove_id = request.form["remove"][73:-4] 
-
-            #image path to match with curteamimg, get index
-            #index = (curteamimg.index(request.form["remove"]))
-
-            #print(curteam[request.form["remove"]])
-            #print(sqlprep.getPokemonFromName(curteam[request.form["remove"]]))
             index = int(request.form["remove"])
             print((curteam[index]))
             removePokemon = curteam[index]
@@ -366,8 +350,19 @@ def edit():
             return redirect(url_for("edit"))
         
   
-    return render_template("edit.html", curteamimg=curteamimg, curteam = curteam, curTeamSet2 = curTeamSet2, topFive=topFive, topFiveMoves = topFiveMoves)
+    return render_template("edit.html", curteamimg=curteamimg, curteam = curteam, curTeamSet2 = curTeamSet2, topFive=topFive, topFiveMoves = topFiveMoves, stats = stats)
 
+
+@app.route("/submitTeam")
+def submitTeam():
+    print("submittingteam")
+    global currentTeamID
+    global numberOfTeams
+    currentTeamID = sqlprep.getNumberForTeamID(numberOfTeams)
+    print("new team: " + str(currentTeamID))
+    session.pop("curteam", None)
+    session.pop("curteamimg", None)
+    return redirect(url_for("team"))
 
 if __name__ == "__main__":
     app.run(debug=True)
