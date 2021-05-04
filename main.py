@@ -74,9 +74,10 @@ def home():
             if request.method == "GET":
                 #make a session[curcomments] or something like that
                 comment = request.args.get("comment")
-                new_comment = sqlalc.AddToComment(team, comment)
-                sqlalc.session.merge(new_comment)
-                sqlalc.session.commit()
+                print(comment)
+                #new_comment = sqlalc.AddToComment(team, comment)
+                #sqlalc.session.merge(new_comment)
+                #sqlalc.session.commit()
 
         return render_template("home.html", teams = team_ids, teamnames = pokemon_names, teamimgs = pokemon_imgs)
 

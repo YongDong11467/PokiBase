@@ -3,25 +3,29 @@
 {% block content %}
     <div class="container" id="team">
         <div>
-            <h2>Welcome to Pokibase</h2>
+            <h1>Welcome to Pokibase</h1>
         </div>
         {% if teamimgs != None %}
             <div class="justify-content-center">
-                <ul class="list-group list-group-horizontal justify-content-center">
+                <!--<ul class="list-group list-group-horizontal justify-content-center">-->
                     {% for j in range(0, teams|length) %}
-                        {% for i in range(0, teamimgs[j]|length) %}
-                        <li class="list-group-item">
-                            <div>
-            <!--                            <img src="{{ url_for('static', filename='./images/unknown.png')}}"  width="100" height="100">-->
-                                <img src="{{teamimgs[j][i]}}" width="100" height="100">
-                            </div>
-                            <div>
-                                <span>{{teamnames[j][i]}}</span>
-                                <br>
-            <!--                            <span class="badge bg-secondary">Normal</span>-->
-                            </div>
-                        </li>
-                        {% endfor %}
+                        <body>
+                            <h3>Team Number: <span>{{teams[j]}}</span></h1>
+                        </body>
+                        <ul class="list-group list-group-horizontal justify-content-center">
+                            {% for i in range(0, teamimgs[j]|length) %}
+                            <li class="list-group-item">
+                                <div>
+                <!--                            <img src="{{ url_for('static', filename='./images/unknown.png')}}"  width="100" height="100">-->
+                                    <img src="{{teamimgs[j][i]}}" width="100" height="100">
+                                </div>
+                                <div>
+                                    <span>{{teamnames[j][i]}}</span>
+                                    <br>
+                <!--                            <span class="badge bg-secondary">Normal</span>-->
+                                </div>
+                            </li>
+                            {% endfor %}
                         <!--<a class="btn btn-primary" type="button" href="/commentonteam">Add Comment</a>-->
                         <div class="mt-5 container">
                             <div class="row">
@@ -37,8 +41,9 @@
                                 </form>
                             </div>
                         </div>
+                    </ul>
                     {% endfor %}
-                </ul>
+                <!--</ul>-->
             </div>
         {%endif %}
     </div>
