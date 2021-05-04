@@ -226,7 +226,7 @@ def getTopFiveMoves():
     return topFive
     
 def getTeams():
-    stmt = "SELECT DISTINCT teamid FROM teamrel"
+    stmt = "SELECT DISTINCT teamid FROM teamrel ORDER BY teamid"
     cursor.execute(stmt)
     team_ids = []
     #print(cursor)
@@ -234,8 +234,8 @@ def getTeams():
         team_ids.append(-1)
         return team_ids
     for team in cursor:
-        #print("TEAM ID:" + str(team)[1:2])
-        team_ids.append(str(team)[1:2])
+        team_ids.append(str(team)[1:len(str(team))-2])
+        #print("TEAM ID:" + str(team)[1:len(str(team))-1])
         
     return team_ids
 
@@ -244,7 +244,7 @@ def getTeamPokemon(teamId):
     cursor.execute(stmt, (teamId,))
     pokemon_names = []
     for pokemon in cursor:
-        print(str(pokemon)[2:len(str(pokemon))-3])
+        #print(str(pokemon)[2:len(str(pokemon))-3])
         pokemon_names.append(str(pokemon)[2:len(str(pokemon))-3])
     
     return pokemon_names
@@ -275,3 +275,16 @@ def getNumberForTeamID(maxTeams):
     else:
         return next(iter(unusedTeams))
         
+def getComments():
+    stmt = "SELECT comment.description FROM comment"
+    cursor.execute(stmt)
+    comments = []
+    for comment in cursor:
+        #check if the comment is "None"
+        curr_comment = str(comment)[1:-2]
+        #print(curr_comment)
+        if curr_comment != "None":
+            comments.append(str(comment)[2:-3])
+        else:
+            comments.append(None)
+    return comments
