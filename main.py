@@ -39,11 +39,9 @@ mostRecentPokemon = -1
 #Sets number of possible teams in the database
 numberOfTeams = 10
 
-#Current team id of session
-#currentTeamID = 1
+#Current team id 
 currentTeamID = sqlprep.getNumberForTeamID(numberOfTeams)
-print("(GLobal)currentTeamID:")
-print(currentTeamID)
+print("(Global)currentTeamID: " + str(currentTeamID))
 
 #TODO: Create a session
 #TODO: Organize files with blueprint
@@ -136,22 +134,12 @@ def team():
             ability = sqlalc.getAbility(search)
     if request.method == "POST": 
         print(request.form)
-        print("remove")
+        #print("remove")
 
         #the entire team is gone
         if len(curteam) == 1:
             return redirect(url_for("clearteam"))
-
-        #get pokemon id to remove
-        #remove_id = request.form["remove"][73:-4] 
-
-        #image path to match with curteamimg, get index
-        #index = (curteamimg.index(request.form["remove"]))
-
-        #print(curteam[request.form["remove"]])
-        #print(sqlprep.getPokemonFromName(curteam[request.form["remove"]]))
         index = int(request.form["remove"])
-        print((curteam[index]))
         removePokemon = curteam[index]
         remove_id = sqlprep.getPokemonFromName(removePokemon)
         
@@ -261,41 +249,16 @@ def edit():
     curteam = session['curteam']
     curteamimg = session['curteamimg']
 
-    curTeamSet = [[0] * 1 for row in range(len(curteam))] 
-    
-    i = 0   
-    for pokemon in curteam:
-        #print(pokemon)
-        moveSet = sqlprep.getMovesFromName(pokemon)
-        #print(moveSet)
-        #curTeamSet[i][0] = pokemon
-        curTeamSet[i][0] = curteamimg[i]
-        #print(pokemon + str(i))
-        curTeamSet[i].append(moveSet)
-        #curTeamSet[i].pop()
-        i = i + 1
-
     curTeamSet2 = [] 
    
+   #array of movesets for each pokemon in the team
     for pokemon in curteam:
         moveSet = sqlprep.getMovesFromName(pokemon)
         curTeamSet2.append(moveSet)
 
-    #print(curTeamSet2) 
-    print(curteam)
     topFive = sqlprep.getTopFive()
     topFiveMoves = sqlprep.getTopFiveMoves()
     stats = sqlprep.aggregateTeamStats(currentTeamID)
-    print(stats)
-    #print(curTeamSet)
-
-    #if request.method == "GET":
-        #returns ## where 1st number is pokemon index in curteam
-        #and 2nd number is the number of move
-        #print(request.form)
-        #print(request.form["00"])
-
-    #print(topFive)
 
     #finds pokemon to get removed and edits moves
     if request.method == "POST": 
@@ -335,16 +298,11 @@ def edit():
             for i in range(0,4):
                 print(request.form[s[i]])
                 pickedMoves.append(sqlprep.getMoveIDFromMoveName(request.form[s[i]]))
-                #print(sqlprep.getMoveIDFromMoveName(s[i]))
 
             #update teamrel table
             print(currentTeamID, movesPokemonID, pickedMoves[0], pickedMoves[1], pickedMoves[2], pickedMoves[3])
             sqlprep.updateMovesinTeamRel(currentTeamID, movesPokemonID, pickedMoves[0], pickedMoves[1], pickedMoves[2], pickedMoves[3])
 
-
-        
-        #except:
-            #print("no submit")
         if res2 == "remove":
             print("remove")
 
@@ -352,14 +310,6 @@ def edit():
             if len(curteam) == 1:
                 return redirect(url_for("clearteam"))
 
-            #get pokemon id to remove
-            #remove_id = request.form["remove"][73:-4] 
-
-            #image path to match with curteamimg, get index
-            #index = (curteamimg.index(request.form["remove"]))
-
-            #print(curteam[request.form["remove"]])
-            #print(sqlprep.getPokemonFromName(curteam[request.form["remove"]]))
             index = int(request.form["remove"])
             print((curteam[index]))
             removePokemon = curteam[index]
@@ -385,10 +335,6 @@ def submitTeam():
     global currentTeamID
     global numberOfTeams
     currentTeamID = sqlprep.getNumberForTeamID(numberOfTeams)
-    """ if currentTeamID == 10:
-        currentTeamID = 1
-    else :
-        currentTeamID = currentTeamID + 1 """
     print("new team: " + str(currentTeamID))
     session.pop("curteam", None)
     session.pop("curteamimg", None)

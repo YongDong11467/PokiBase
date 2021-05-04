@@ -269,7 +269,7 @@ def getNumberForTeamID(maxTeams):
     print(unusedTeams)
     if len(unusedTeams) == 0:
         newID = randint(1,maxTeams)
-        print(newID)
+        #print(newID)
         deleteTeam(newID)
         return newID
     else:
