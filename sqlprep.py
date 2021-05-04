@@ -29,19 +29,26 @@ def removeFromTeam(team, pokemon):
     #count = new count, teamid = team
     stmt3 = "UPDATE pokibase.team SET count=%s WHERE teamid=%s" #could make this a trigger
 
-    cursor.execute(stmt1, (team, pokemon))
-    cursor.execute(stmt2, (team,))
-    cnt = cursor.fetchone()
-    
-    cnt = cnt[0] - 1
-    
-    cursor.execute(stmt3, (cnt, team))
-    cnx.commit()
+    try:
+        cursor.execute(stmt1, (team, pokemon))
+        cursor.execute(stmt2, (team,))
+        cnt = cursor.fetchone()
+        
+        cnt = cnt[0] - 1
+        
+        cursor.execute(stmt3, (cnt, team))
+        cnx.commit()
+    except:
+        cnx.rollback()
+        print("Error remove from team")
 
 def getMoves(pokemon):
     stmt = "SELECT name FROM move, moverel WHERE move.moveid = moverel.moveid and moverel.pokemonid =%s"
     #maybe change to From move join moverel on move.moveid = moverel.movdie
-    cursor.execute(stmt, (pokemon,))
+    try: 
+        cursor.execute(stmt, (pokemon,))
+    except:
+        print("Error getting moves")
     moveSet = []
     for name in cursor:
         #print(str(name)[1:-3])
@@ -52,7 +59,10 @@ def getMoves(pokemon):
 
 def getMovesFromName(pokemonID):
     stmt = "SELECT name FROM move, moverel, pokemon WHERE move.moveid = moverel.moveid and moverel.pokemonid = pokemon.pokemonid and pokemonname=%s"
-    cursor.execute(stmt, (pokemonID,))
+    try:
+        cursor.execute(stmt, (pokemonID,))
+    except:
+        print("Error getting moves")
     moveSet = []
     for name in cursor:
         #print(str(name)[1:-3])
@@ -66,10 +76,13 @@ def deleteTeam(teamID):
     stmt2 = "DELETE FROM teamrel where teamid=%s"
 
     print("deleteteam")
-
-    cursor.execute(stmt1, (teamID,))
-    cursor.execute(stmt2, (teamID,))
-    cnx.commit()
+    try:
+        cursor.execute(stmt1, (teamID,))
+        cursor.execute(stmt2, (teamID,))
+        cnx.commit()
+    except:
+        cnx.rollback()
+        print("Error deleting team")
 
 def getTopFive():
     stmt = """select pokemonname
@@ -80,7 +93,10 @@ def getTopFive():
         order by cnt desc
         limit 5) as t2
         where t1.pokemonid = t2.pokemonid;"""
-    cursor.execute(stmt)
+    try:
+        cursor.execute(stmt)
+    except:
+        print("Error getting top 5 pokemon")
     topFive = []
     for name in cursor:
         topFive.append(name[0])
@@ -94,7 +110,10 @@ def aggregateTeamStats(teamID):
     FROM pokibase.statv2 as s Join pokibase.teamrel as r
     On s.pokemonid = r.pokemonid 
     where r.teamid = %s"""
-    cursor.execute(stmt, (teamID,))
+    try:
+        cursor.execute(stmt, (teamID,))
+    except:
+        print("Error aggregating stats")
     stats = []
     labels = ["hp: ", "atk: ", "defense: ", "spatk: ", "spdef: ", "spd: "]
     for s in cursor:
@@ -107,12 +126,18 @@ def aggregateTeamStats(teamID):
 
 def getPokemonFromName(name):
     stmt = "SELECT pokemonid FROM pokibase.pokemon where pokemonname=%s;"
-    cursor.execute(stmt, (name,))
+    try:
+        cursor.execute(stmt, (name,))
+    except:
+        print("Error getting pokemon")
     return cursor.fetchone()[0]
 
 def getMoveIDFromMoveName(name):
     stmt = "SELECT moveid FROM pokibase.move where name =%s;"
-    cursor.execute(stmt, (name,))
+    try:
+        cursor.execute(stmt, (name,))
+    except:
+        print("Error getting moveID")
     x = cursor.fetchone()
     #print
     if x is None:
@@ -127,8 +152,11 @@ def updateMovesinTeamRel(team, pokemon, m1, m2, m3, m4):
         Set moveid1=%s, moveid2=%s, moveid3=%s, moveid4=%s
         where teamid =%s and pokemonid =%s ;
         """
-    cursor.execute(stmt, (m1, m2, m3, m4, team, pokemon))
-    cnx.commit()
+    try:
+        cursor.execute(stmt, (m1, m2, m3, m4, team, pokemon))
+        cnx.commit()
+    except:
+        print("Error updating moves")
 
 def getTopMoves():
     stmt = """
@@ -186,7 +214,10 @@ def getTopFiveMoves():
     order by cnt desc) as t3
     limit 5; """
 
-    cursor.execute(stmt)
+    try: 
+        cursor.execute(stmt)
+    except:
+        print("Error getting top 5 moves")
     topFive = []
     for move in cursor:
         topFive.append(move[0])
@@ -220,8 +251,11 @@ def getTeamPokemon(teamId):
 
 def getNumberForTeamID(maxTeams):
     stmt = "SELECT teamid FROM pokibase.team;"
-    cursor.execute(stmt)
-    cnx.commit()
+    try:
+        cursor.execute(stmt)
+        cnx.commit()
+    except:
+        print("Error getting number for teamID")
     setOfTeams = set()
     potentialTeams = set()
     for t in cursor:
@@ -235,6 +269,7 @@ def getNumberForTeamID(maxTeams):
     print(unusedTeams)
     if len(unusedTeams) == 0:
         newID = randint(1,maxTeams)
+        print(newID)
         deleteTeam(newID)
         return newID
     else:
