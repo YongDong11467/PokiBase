@@ -1,6 +1,32 @@
 {% extends "base.html" %}
 {% block title %}Home Page{% endblock %}
 {% block content %}
+<head>
+<style>
+h1 {text-align: center;}
+h2 {text-align: center;}
+h3 {text-align: center;}
+h4 {text-align: center;}
+h5 {text-align: center;}
+h6 {text-align: center;}
+.center {
+    margin: auto;
+    width: 40%;
+    padding: 100px;
+}
+.center2 {
+    margin: auto;
+    width: 20%;
+    padding: 10px;
+}
+.space {
+  background-color: rgb(172, 231, 255);
+  border: 2px solid black;
+  margin: 20px;
+  padding: 20px;
+}
+</style>
+</head>
     <div class="container" id="team">
         <div>
             <h1>Welcome to Pokibase</h1>
@@ -8,40 +34,57 @@
         {% if teamimgs != None %}
             <div class="justify-content-center">
                 <!--<ul class="list-group list-group-horizontal justify-content-center">-->
+                    <div class="mt-5 container">
+                        <div class="space">
+                            <form class="form-inline" action="/" method="GET">
+                                <ul class="list-group list-group-horizontal justify-content-center"></ul>
+                                    <li class="list-group-item">
+                                        <div class="col-auto">
+                                            <label for="team"> Which team to comment on?</label>
+                                            <input type="text" name="team" maxlength="3" size="3"><br><br>
+                                            <label for="comment"> Enter comment:</label>
+                                            <input type="text" name="comment" maxlength="50" size="50"><br><br>
+                                            <button class="btn btn-outline-success" type="submit" value="submit">Comment!</button>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <!--<div class="col-auto">-->
+                                    <!--<a class="btn btn-primary" type="button" href="/commentonteam">Comment on a team!</a>-->
+                                <!--</div>-->
+                            </form>
+                        </div>
+                    </div>
                     {% for j in range(0, teams|length) %}
-                        <body>
-                            <h3>Team Number: <span>{{teams[j]}}</span></h1>
-                        </body>
                         <ul class="list-group list-group-horizontal justify-content-center">
                             {% for i in range(0, teamimgs[j]|length) %}
                             <li class="list-group-item">
                                 <div>
-                <!--                            <img src="{{ url_for('static', filename='./images/unknown.png')}}"  width="100" height="100">-->
                                     <img src="{{teamimgs[j][i]}}" width="100" height="100">
                                 </div>
-                                <div>
+                                <div class = "justify-content-center">
                                     <span>{{teamnames[j][i]}}</span>
                                     <br>
-                <!--                            <span class="badge bg-secondary">Normal</span>-->
                                 </div>
                             </li>
                             {% endfor %}
-                        <!--<a class="btn btn-primary" type="button" href="/commentonteam">Add Comment</a>-->
-                        <div class="mt-5 container">
-                            <div class="row">
-                                <form class="form-inline" action="/" method="GET">
-                                    <div class="col-auto">
-                                        <!--<label for="comment"> Comment:</label>-->
-                                        <!--<textarea class="form-control" rows="3" id="comment"></textarea>-->
-                                        <input class="form-control" type="text" name="comment" placeholder="Comment on team">
-                                    </div>
-                                    <div class="col-auto">
-                                        <button class="btn btn-primary" type="submit" value="submit">Comment</button>
-                                    </div>
-                                </form>
+                            <div>
+                                <h3>Team Number <span>{{teams[j]}}</span></h3>
                             </div>
-                        </div>
-                    </ul>
+                            {% if comments != None %}
+                                {% if curr_comments[j] != None %}
+                                    <div>
+                                        <h6>{{curr_comments[j]}}</span></h6>
+                                    </div>
+                                {% endif %}
+                                {% if curr_comments[j] == None %}
+                                    {% if comments[j] != None %}
+                                        <div>
+                                            <h6><span>{{comments[j]}}</span></h6>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </ul>
                     {% endfor %}
                 <!--</ul>-->
             </div>

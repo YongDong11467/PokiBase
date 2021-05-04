@@ -46,12 +46,18 @@ currentTeamID = 3
 #TODO: Create a session
 #TODO: Organize files with blueprint
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def home():
+    if not 'new_comments' in session:
+        session['new_comments'] = []
+    currcomments = session['new_comments']
+
     team_ids = sqlprep.getTeams()
+    #print(team_ids)
     if team_ids[0] != -1:
         pokemon_imgs = [] 
         pokemon_names = []
+        index_position = {}
         team_count = 0
         pokemon_count = 0
         for team in team_ids:
@@ -61,29 +67,37 @@ def home():
                 res = requests.get(baseUrl + f'pokemon/{pokemon}')
                 #print("THE FOLLOWING IS BASE URL:\n" + baseUrl + f'pokemon/{pokemon}')
                 if res.content != b'Not Found':
-                    #print("hi")
                     curr_pokemon = json.loads(res.content)
                     curr_team_imgs.append(curr_pokemon["sprites"]["front_default"])
                 else :
-                    print("bye")
+                    print()
                 pokemon_count = pokemon_count+1
-            team_count = team_count + 1
+
             pokemon_imgs.append(curr_team_imgs)
             pokemon_names.append(names)
+            #get the position in the array of each team
+            index_position[team] = team_count
+            team_count = team_count + 1
+            if len(currcomments) < len(team_ids) :
+                currcomments.append(None)
 
-            if request.method == "GET":
-                #make a session[curcomments] or something like that
-                comment = request.args.get("comment")
-                print(comment)
-                #new_comment = sqlalc.AddToComment(team, comment)
-                #sqlalc.session.merge(new_comment)
-                #sqlalc.session.commit()
+        if request.method == "GET":
+            comment = request.args.get("comment")
+            team = request.args.get("team")
+            if comment != None and team != None:
+                new_comment = sqlalc.AddToComment(team, comment)
+                sqlalc.session.merge(new_comment)
+                sqlalc.session.commit()
+                temp = session.new
+                currcomments[index_position[team]] = comment
 
-        return render_template("home.html", teams = team_ids, teamnames = pokemon_names, teamimgs = pokemon_imgs)
-
+        print(currcomments)
+        all_comments = sqlprep.getComments()
+        session['new_comments'] = currcomments
+        #print(currcomments)
+        return render_template("home.html", teams = team_ids, curr_comments = currcomments, comments = all_comments, teamnames = pokemon_names, teamimgs = pokemon_imgs)
     else:
-        print("bye2")
-        return render_template("home.html", teams = None, teamimgs = None)
+        return render_template("home.html", teams = None, curr_comments = None, comments = None, teamnames = None, teamimgs = None)
 
 @app.route('/team', methods=['GET', 'POST'])
 def team():
@@ -186,8 +200,7 @@ def clearteam():
 
 @app.route('/commentonteam')
 def commentonteam(teamid):
-    comment = request.args.get("comment")
-    new_comment = sqlalc.AddToComment(teamid, comment)
+    
     return redirect(url_for("home"))
 
 def updateMovesTable(pokemoneid, moves):
