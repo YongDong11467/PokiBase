@@ -68,6 +68,14 @@ def home():
             team_count = team_count + 1
             pokemon_imgs.append(curr_team_imgs)
             pokemon_names.append(names)
+
+            if request.method == "GET":
+                #make a session[curcomments] or something like that
+                comment = request.args.get("comment")
+                new_comment = sqlalc.AddToComment(team, comment)
+                sqlalc.session.merge(new_comment)
+                sqlalc.session.commit()
+
         return render_template("home.html", teams = team_ids, teamnames = pokemon_names, teamimgs = pokemon_imgs)
 
     else:
@@ -174,7 +182,9 @@ def clearteam():
     return redirect(url_for("team"))
 
 @app.route('/commentonteam')
-def commentonteam():
+def commentonteam(teamid):
+    comment = request.args.get("comment")
+    new_comment = sqlalc.AddToComment(teamid, comment)
     return redirect(url_for("home"))
 
 def updateMovesTable(pokemoneid, moves):

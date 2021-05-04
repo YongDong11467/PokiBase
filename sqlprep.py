@@ -80,3 +80,11 @@ def getTeamPokemon(teamId):
         pokemon_names.append(str(pokemon)[2:len(str(pokemon))-3])
     
     return pokemon_names
+
+def getComments():
+    stmt = "SELECT * FROM comment"
+    cursor.execute(stmt)
+    comments = []
+    for comment in cursor:
+        comments.append(comment)
+    return comments
