@@ -37,7 +37,7 @@ data = []
 mostRecentPokemon = -1
 
 #Sets number of possible teams in the database
-numberOfTeams = 10
+numberOfTeams = 20
 
 #Current team id 
 currentTeamID = sqlprep.getNumberForTeamID(numberOfTeams)

@@ -74,11 +74,13 @@ def getMovesFromName(pokemonID):
 def deleteTeam(teamID):
     stmt1 = "DELETE FROM team WHERE teamid=%s"
     stmt2 = "DELETE FROM teamrel where teamid=%s"
+    stmt3 = "DELETE FROM comment where teamid=%s"
 
     print("deleteteam")
     try:
         cursor.execute(stmt1, (teamID,))
         cursor.execute(stmt2, (teamID,))
+        cursor.execute(stmt3, (teamID,))
         cnx.commit()
     except:
         cnx.rollback()
